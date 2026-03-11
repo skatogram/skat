@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{e3d7229b-8f6a-4844-b62e-06813cdf5d60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\drawing">
+      <UniqueIdentifier>{f2a62f6b-47cd-4368-9a0b-39571e0ecb6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\utils">
+      <UniqueIdentifier>{4feeda76-230c-4aff-9862-5b40be2ec0a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\sdk">
+      <UniqueIdentifier>{e7118637-4a27-454c-a2e7-0f7a50b5950c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core\sdk\il2cpp">
+      <UniqueIdentifier>{05bbfb5a-dd07-4ada-9653-cf6442e35426}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="entry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_dx11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_impl_win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\buffer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\HDE\hde32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\HDE\hde64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\hook.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="minhook\src\trampoline.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Imgui\freetype\imgui_freetype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\sdk\utils\json.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\includes\connection_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\includes\discord_register_win.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\includes\discord_rpc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\includes\rpc_connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\includes\serialization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="discord\main\discord_rpc_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="core\drawing\d3d.hpp">
+      <Filter>Source Files\core\drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\utils\hookengine.hpp">
+      <Filter>Source Files\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\mem.hpp">
+      <Filter>Source Files\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\vector.hpp">
+      <Filter>Source Files\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\utils\xorstr.hpp">
+      <Filter>Source Files\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\il2cpp\dissector.hpp">
+      <Filter>Source Files\core\sdk\il2cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\il2cpp\wrapper.hpp">
+      <Filter>Source Files\core\sdk\il2cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="core\stdafx.hpp">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\utils\crc32.hpp">
+      <Filter>Source Files\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\game.hpp">
+      <Filter>Source Files\core\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\structs.hpp">
+      <Filter>Source Files\core\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="core\main\hooks.hpp">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\main\entities.hpp">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\main\other.hpp">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\utils\math.hpp">
+      <Filter>Source Files\core\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="core\sdk\utils\string.hpp" />
+    <ClInclude Include="core\sdk\utils\xorf.hpp" />
+    <ClInclude Include="core\drawing\Menu\menu.hpp" />
+    <ClInclude Include="core\drawing\Fonts.hpp" />
+    <ClInclude Include="core\drawing\render.hpp" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\ftconfig.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\ftheader.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\ftmodule.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\ftoption.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\ftstdlib.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\integer-types.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\mac-support.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\config\public-macros.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\freetype.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftadvanc.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftbbox.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftbdf.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftbitmap.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftbzip2.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftcache.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftchapters.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftcid.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftcolor.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftdriver.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\fterrdef.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\fterrors.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftfntfmt.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftgasp.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftglyph.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftgxval.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftgzip.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftimage.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftincrem.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftlcdfil.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftlist.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftlogging.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftlzw.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftmac.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftmm.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftmodapi.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftmoderr.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftotval.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftoutln.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftparams.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftpfr.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftrender.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftsizes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftsnames.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftstroke.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftsynth.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftsystem.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\fttrigon.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\fttypes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ftwinfnt.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\autohint.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\cffotypes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\cfftypes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\compiler-macros.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftcalc.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftdebug.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftdrv.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftgloadr.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\fthash.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftmemory.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftmmtypes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftobjs.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftpsprop.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftrfork.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftserv.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftstream.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\fttrace.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\ftvalid.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\psaux.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\pshints.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svbdf.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svcfftl.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svcid.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svfntfmt.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svgldict.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svgxval.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svkern.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svmetric.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svmm.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svotval.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svpfr.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svpostnm.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svprop.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svpscmap.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svpsinfo.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svsfnt.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svttcmap.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svtteng.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svttglyf.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\services\svwinfnt.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\sfnt.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\svginterface.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\t1types.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\tttypes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\internal\wofftypes.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\otsvg.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\t1tables.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\ttnameid.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\tttables.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\freetype\tttags.h" />
+    <ClInclude Include="Imgui\freetype\freetype\include\ft2build.h" />
+    <ClInclude Include="Imgui\freetype\imgui_freetype.h" />
+    <ClInclude Include="Imgui\imconfig.h" />
+    <ClInclude Include="Imgui\imgui.h" />
+    <ClInclude Include="Imgui\imgui_impl_dx11.h" />
+    <ClInclude Include="Imgui\imgui_impl_win32.h" />
+    <ClInclude Include="Imgui\imgui_internal.h" />
+    <ClInclude Include="Imgui\imstb_rectpack.h" />
+    <ClInclude Include="Imgui\imstb_textedit.h" />
+    <ClInclude Include="Imgui\imstb_truetype.h" />
+    <ClInclude Include="minhook\include\MinHook.h" />
+    <ClInclude Include="minhook\src\buffer.h" />
+    <ClInclude Include="minhook\src\HDE\hde32.h" />
+    <ClInclude Include="minhook\src\HDE\hde64.h" />
+    <ClInclude Include="minhook\src\HDE\pstdint.h" />
+    <ClInclude Include="minhook\src\HDE\table32.h" />
+    <ClInclude Include="minhook\src\HDE\table64.h" />
+    <ClInclude Include="minhook\src\trampoline.h" />
+    <ClInclude Include="utils\DiscordInterface.hpp" />
+    <ClInclude Include="utils\Fingerprint.hpp" />
+    <ClInclude Include="utils\WinReg.hpp" />
+    <ClInclude Include="Imgui\colors.h" />
+    <ClInclude Include="core\sdk\Config.hpp" />
+    <ClInclude Include="core\drawing\Menu\HitMarker.h" />
+    <ClInclude Include="offsets.h" />
+    <ClInclude Include="core\sdk\utils\json.hpp" />
+    <ClInclude Include="sound.h" />
+    <ClInclude Include="discord\includes\backoff.h" />
+    <ClInclude Include="discord\includes\connection.h" />
+    <ClInclude Include="discord\includes\discord_register.h" />
+    <ClInclude Include="discord\includes\discord_rpc.h" />
+    <ClInclude Include="discord\includes\msg_queue.h" />
+    <ClInclude Include="discord\includes\rpc_connection.h" />
+    <ClInclude Include="discord\includes\serialization.h" />
+    <ClInclude Include="discord\main\discord_rpc_init.h" />
+    <ClInclude Include="auth.h" />
+    <ClInclude Include="keyauth\json.hpp" />
+    <ClInclude Include="keyauth\jsonauth.hpp" />
+    <ClInclude Include="core\main\serverchecker.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="keyauth\libcurl.lib" />
+    <Library Include="keyauth\library_x64.lib" />
+  </ItemGroup>
+</Project>
