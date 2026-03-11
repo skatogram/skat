@@ -23,6 +23,7 @@ namespace funcs
 		bool customhitsound = false;
 		bool antiaimfix = false;
 		int fakeshotskey = 0;
+		int fakeshotskeymode = 0;
 		bool recoilas = false;
 		float norecoil = 100.f;
 		float ROT = 2.f;
@@ -72,8 +73,10 @@ namespace funcs
 		bool fakeadmin = false;
 		bool interactivedebug = false;
 		int interactivedebugkey = 0;
+		int interactivedebugkeymode = 0;
 		bool noplayercollision = false;
 		int ignoreanyfly = 0;
+		int ignoreanyflymode = 0;
 		bool nosprintrestriction = false;
 		bool nofalldamage = false;
 		bool nojumprestriction = false;
@@ -82,6 +85,7 @@ namespace funcs
 		bool walkonwater = false;
 		bool teleporttohead = false;
 		int teleporttoheadkey = 0;
+		int teleporttoheadkeymode = 0;
 		bool antiaim = false;
 		bool instapickup = false;
 		bool autocollect = false;
@@ -91,7 +95,9 @@ namespace funcs
 		bool zoomhack = false;
 		bool customerfov = false;
 		int zoom = 0;
+		int zoommode = 0;
 		int die = 0;
+		int diemode = 0;
 		bool aspect = false;
 		float aspectvalue = 5.f;
 		bool noattackrestriction = false;
@@ -104,6 +110,7 @@ namespace funcs
 		bool dot = false;
 		bool teleportsphere = false;
 		int teleportspherekey = 0;
+		int teleportspherekeymode = 0;
 		float teleportspherecol[] = { 1.f, 1.f,1.f,1.f };
 		bool movementline = false;
 		float movementlinecol[] = { 1.f, 1.f,1.f,1.f };
@@ -122,8 +129,10 @@ namespace funcs
 		bool speedhack;
 		float speedhackfloat = 50.f;
 		int speedhackkey = 0;
+		int speedhackkeymode = 0;
 		bool bhop = false;
 		int bhopkey = 0;
+		int bhopkeymode = 0;
 		bool instaheal = false;
 		
 	}
@@ -133,7 +142,9 @@ namespace funcs
 		bool locktarget = false;
 		int autoshottype = 0;
 		int key{ };
+		int keymode = 0;
 		int targetlockkey{ };
+		int targetlockkeymode = 0;
 		int a_spot = 0;
 		float fov = 100.f;
 		bool drawfov = false;
@@ -152,6 +163,7 @@ namespace funcs
 		float desync = 0.0f;
 		bool manipulator = false;
 		int manipulatorkey = 0;
+		int manipulatorkeymode = 0;
 		bool desyncindicator = false;
 		float maxdesyncfloat = 0.6f;
 		bool burstshot = false;

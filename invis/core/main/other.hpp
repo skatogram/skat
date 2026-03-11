@@ -1,4 +1,4 @@
-struct Point {
+п»їstruct Point {
 	double x;
 	double y;
 };
@@ -141,6 +141,7 @@ bool ValidateEyePos(Vector3 eyePos)
 
 void validatemanipulatorpos(float maxxzmanipulator, float maxymanipulator)
 {
+	if (target_ply == nullptr) return;
 	Vector3 targetheadpos =  funcs::other::BulletPos != Vector3::Zero() ? funcs::other::BulletPos : target_ply->BonePosition(AimSpotInt);
 	float ymanipulator = maxymanipulator - 0.25 + (maxxzmanipulator / 40);
 	float xzmanipulator = maxxzmanipulator - 0.20 + (maxxzmanipulator / 50);
@@ -222,10 +223,10 @@ namespace other {
 		float num4 = (last_tick_time + num2 + num3) * num;
 		/*float num5 = 5.5 + player->GetParentVelocity().Magnitude() + player->GetMountVelocity().Magnitude();*/
 		float num5 = player->MaxVelocity() + player->GetParentVelocity().Magnitude();
-		float num6 = player->BoundsPadding() + num4 * num5; // бок десинка
+		float num6 = player->BoundsPadding() + num4 * num5; // Р±РѕРє РґРµСЃРёРЅРєР°
 
 		float num8 = Mathf::Abs(player->GetMountVelocity().y + player->GetParentVelocity().y);
-		float num9 = player->BoundsPadding() + num4 * num8 + player->GetJumpHeight(); //верх десинка
+		float num9 = player->BoundsPadding() + num4 * num8 + player->GetJumpHeight(); //РІРµСЂС… РґРµСЃРёРЅРєР°
 
 		bool visible = false;
 

@@ -1,4 +1,4 @@
-﻿
+
 static inline ImVec2  operator*(const ImVec2& lhs, const float rhs) { return ImVec2(lhs.x * rhs, lhs.y * rhs); }
 static inline ImVec2  operator/(const ImVec2& lhs, const float rhs) { return ImVec2(lhs.x / rhs, lhs.y / rhs); }
 static inline ImVec2  operator+(const ImVec2& lhs, const ImVec2& rhs) { return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y); }
@@ -119,7 +119,7 @@ void generalmenu() //разделение на войды чтобы компи�
 		{
 			ImGui::Checkbox(menu::rus ? __(u8"Аим") : __("Aim"), &funcs::psilent::psilent);
 			if (funcs::psilent::autoshottype == 1) 
-				ImGui::Keybind(menu::rus ? __(u8"Бинд Аимбота") : __("Aim bind"), &funcs::psilent::key, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Бинд Аимбота") : __("Aim bind"), &funcs::psilent::key, &funcs::psilent::keymode);
 			ImGui::Checkbox(menu::rus ? __(u8"Аим хелпер") : __("Aim Helper"), &funcs::weapon::aimhelper);
 			if ( funcs::weapon::aimhelper )
 			{
@@ -138,7 +138,7 @@ void generalmenu() //разделение на войды чтобы компи�
 				ImGui::Combo(menu::rus ? __(u8"Менять хитбокс на") : __("Override Hitbox"), &funcs::weapon::hitboxoverride, menu::rus ? __(u8"Выключен\0Голова\0Тело\0Случайный\0Случайный без головы\0Голова/Тело\0") : __("Disabled\0Head\0Body\0Random All\0Random with no head\0Head/body\0"));
 			ImGui::Checkbox(menu::rus ? __(u8"Приоритетная цель") : __("Target lock"), &funcs::psilent::locktarget);
 			if (funcs::psilent::locktarget)
-				ImGui::Keybind(menu::rus ? __(u8"Бинд приоритета") : __("Targen lock bind"), &funcs::psilent::targetlockkey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Бинд приоритета") : __("Targen lock bind"), &funcs::psilent::targetlockkey, &funcs::psilent::targetlockkeymode);
 			ImGui::Checkbox(menu::rus ? __(u8"Имя таргета") : __("Target Name"), &funcs::psilent::target_name);
 			ImGui::Checkbox(menu::rus ? __(u8"Линия до таргета") : __("Target Line"), &funcs::psilent::target_line);
 			ImGui::Checkbox(menu::rus ? __(u8"Буллет Телепорт на вертолёт") : __("Patrol Heli bullet tp"), &funcs::weapon::helimagic);
@@ -167,7 +167,7 @@ void generalmenu() //разделение на войды чтобы компи�
 			ImGui::Checkbox(menu::rus ? __(u8"Манипулятор") : __("Manipulator"), &funcs::manipulator::manipulator);
 			ImGui::Combo(menu::rus ? __(u8"Включение манипулятора") : __("Manipulator enable"), &funcs::manipulator::desyncmode, menu::rus ? __(u8"Всегда\0На бинд\0") : __("Always\0On Key\0"));
 			if (funcs::manipulator::desyncmode == 1) {
-				ImGui::Keybind(menu::rus ? __(u8"Манипулятор бинд") : __("Manipulator Key"), &funcs::manipulator::manipulatorkey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Манипулятор бинд") : __("Manipulator Key"), &funcs::manipulator::manipulatorkey, &funcs::manipulator::manipulatorkeymode);
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Выстрелить неск. пуль") : __("Burst Shot"), &funcs::manipulator::burstshot);
 			ImGui::Checkbox(menu::rus ? __(u8"Индикатор манипулятора") : __("Desync indicator"), &funcs::manipulator::desyncindicator);
@@ -221,7 +221,7 @@ void generalmenu() //разделение на войды чтобы компи�
 			ImGui::Checkbox(menu::rus ? __(u8"Фейк выстрелы") : __("Fake Shots"), & funcs::weapon::fakeshots);
 			if (funcs::weapon::fakeshots)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"Бинд фейк выстрелов") : __("Fake Shots Key"), &funcs::weapon::fakeshotskey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Бинд фейк выстрелов") : __("Fake Shots Key"), &funcs::weapon::fakeshotskey, &funcs::weapon::fakeshotskeymode);
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Хитсаунд") : __("Hitsound"), & funcs::weapon::customhitsound);
 		}
@@ -253,14 +253,14 @@ void projectilemenu()
 				if (funcs::localplayer::speedhack)
 				{
 					ImGui::SliderFloat(menu::rus ? __(u8"Cкорость спидхака") : __("Speedhack %"), &funcs::localplayer::speedhackfloat, 0.f, 100.f, __("%.2f"));
-					ImGui::Keybind(menu::rus ? __(u8"Rнопка скорости") : __("Speedhack key"), &funcs::localplayer::speedhackkey, 0);
+					ImGui::Keybind(menu::rus ? __(u8"Rнопка скорости") : __("Speedhack key"), &funcs::localplayer::speedhackkey, &funcs::localplayer::speedhackkeymode);
 				}
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Флайхак индикатор") : __("Flyhack indicator"), &funcs::flyhack::flyhackindicator);
 			ImGui::Checkbox(menu::rus ? __(u8"Антикик флайхака") : __("Anti FlyHack Kick"), &funcs::flyhack::antiflyhack);
 			if (funcs::flyhack::antiflyhack)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"Игнор стопера") : __("Stopper ignoring"), &funcs::localplayer::ignoreanyfly, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Игнор стопера") : __("Stopper ignoring"), &funcs::localplayer::ignoreanyfly, &funcs::localplayer::ignoreanyflymode);
 			}
 			
 			ImGui::Checkbox(menu::rus ? __(u8"Убрать колизию") : __("No Collision"), &funcs::localplayer::noplayercollision);
@@ -268,13 +268,13 @@ void projectilemenu()
 			ImGui::Checkbox(menu::rus ? __(u8"Интерактив дебаг") : __("Interactive Debug"), &funcs::localplayer::interactivedebug);
 			if (funcs::localplayer::interactivedebug)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"Кнопка дебага") : __("Debug key"), &funcs::localplayer::interactivedebugkey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Кнопка дебага") : __("Debug key"), &funcs::localplayer::interactivedebugkey, &funcs::localplayer::interactivedebugkeymode);
 			}
 
 			ImGui::Checkbox(menu::rus ? __(u8"Телепорт на голову") : __("TP to Head Player"), &funcs::localplayer::teleporttohead);
 			if (funcs::localplayer::teleporttohead)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"Бинд телепорта") : __("Tp key  "), &funcs::localplayer::teleporttoheadkey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Бинд телепорта") : __("Tp key  "), &funcs::localplayer::teleporttoheadkey, &funcs::localplayer::teleporttoheadkeymode);
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Держать оружие всегда") : __("Can Hold Items"), &funcs::localplayer::noattackrestriction);
 			ImGui::Checkbox(menu::rus ? __(u8"Изменять гравитацию") : __("Change gravity"), &funcs::localplayer::gravity);
@@ -305,14 +305,14 @@ void projectilemenu()
 				ImGui::Checkbox(menu::rus ? __(u8"Приближение") : __("Zoom Hack"), &funcs::localplayer::zoomhack);
 				if (funcs::localplayer::zoomhack)
 				{
-					ImGui::Keybind(menu::rus ? __(u8"Кнопка активации") : __("Zoom"), &funcs::localplayer::zoom, 0);
+					ImGui::Keybind(menu::rus ? __(u8"Кнопка активации") : __("Zoom"), &funcs::localplayer::zoom, &funcs::localplayer::zoommode);
 					ImGui::SliderFloat(menu::rus ? __(u8"Увеличить на") : __("Zoom Hack Amount"), &funcs::localplayer::zoomamount, 1.f, 15.f, __("%.2f"));
 				}
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Телепорт сфера") : __("Visual Sphere"), &funcs::localplayer::teleportsphere);
 			if (funcs::localplayer::teleportsphere)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"Кнопка телепорта") : __("Teleport button"), &funcs::localplayer::teleportspherekey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"Кнопка телепорта") : __("Teleport button"), &funcs::localplayer::teleportspherekey, &funcs::localplayer::teleportspherekeymode);
 				ImGui::ColorEdit4(menu::rus ? __(u8"Цвет сферы") : __("Sphere Color"), (float*)&funcs::localplayer::teleportspherecol, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Траектория движения") : __("Movement line"), &funcs::localplayer::movementline);
@@ -344,7 +344,7 @@ void projectilemenu()
 			ImGui::Checkbox(menu::rus ? __(u8"Самоубийство") : __("Suicide"), & funcs::localplayer::suicide);
 			if (funcs::localplayer::suicide)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"бинд кила") : __("Suicide bind"), &funcs::localplayer::die, 0);
+				ImGui::Keybind(menu::rus ? __(u8"бинд кила") : __("Suicide bind"), &funcs::localplayer::die, &funcs::localplayer::diemode);
 			}
 			/*ImGui::Checkbox(menu::rus ? __(u8"Сдвиг экрана") : __("AspectRatio"), & funcs::localplayer::aspect);
 			if (funcs::localplayer::aspect)
@@ -364,7 +364,7 @@ void projectilemenu()
 			ImGui::Checkbox(menu::rus ? __(u8"Авто прыжки") : __("Bhop"), & funcs::localplayer::bhop);
 			if (funcs::localplayer::bhop)
 			{
-				ImGui::Keybind(menu::rus ? __(u8"кнопка прыжков") : __("Bhop key"), &funcs::localplayer::bhopkey, 0);
+				ImGui::Keybind(menu::rus ? __(u8"кнопка прыжков") : __("Bhop key"), &funcs::localplayer::bhopkey, &funcs::localplayer::bhopkeymode);
 			}
 			ImGui::Checkbox(menu::rus ? __(u8"Авто хил") : __("Instaheal"), &funcs::localplayer::instaheal);
 			ImGui::Checkbox(menu::rus ? __(u8"Авто поднятие игроков") : __("Insta Pickup Player"), & funcs::localplayer::instapickup);

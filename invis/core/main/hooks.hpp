@@ -1,4 +1,4 @@
-﻿//Îêñèíåì ñûí øëþøêè
+//Îêñèíåì ñûí øëþøêè
 #pragma once
 #include <intrin.h>
 #define CALLED_BY(func,off) (reinterpret_cast<std::uint64_t>(_ReturnAddress()) > func && reinterpret_cast<std::uint64_t>(_ReturnAddress()) < func + off)
@@ -544,10 +544,8 @@ inline Vector3 BodyLeanOffset_hk(PlayerEyes* a1) noexcept {
 	{
 		if (!a1) return Vector3::Zero();
 		if (!LocalPlayer::Entity()->HasPlayerFlag(PlayerFlags::Connected)) return a1->BodyLeanOffset();
-		Vector3 targetheadpos = funcs::other::BulletPos != Vector3::Zero() ? funcs::other::BulletPos : target_ply->BonePosition(AimSpotInt);
 		bool DesyncMode = funcs::manipulator::desyncmode == 1 ? funcs::manipulator::manipulator && GetAsyncKeyState(funcs::manipulator::manipulatorkey) : funcs::manipulator::manipulator;
-		if (DesyncMode) {
-			if (target_ply != nullptr) {
+		if (DesyncMode && target_ply != nullptr) {
 
 
 				if ( !funcs::manipulator::m_manipulate.empty( ) && LocalPlayer::Entity( )->GetHeldEntity( ) ) {
@@ -908,6 +906,7 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 		}
 	}
 	if (plly->userID() == LocalPlayer::Entity()->userID()) {
+		if (target_ply == nullptr) goto skip_aim_spot;
 		auto transform = target_ply->GetTransform(head)->position();
 		if (funcs::psilent::a_spot == 0) {
 			AimSpotInt = head;
@@ -1018,7 +1017,7 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 				AimSpotInt = spine4;
 			}
 		}
-
+skip_aim_spot:
 		if (funcs::localplayer::weaponchams || funcs::localplayer::heandchams)
 			ConVar::Graphics::chamsfix() = false;
 		Vector3 vector1 = (plly->lastSentTick()->position() + plly->transform()->position()) * 0.5f;
@@ -1110,9 +1109,12 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 					held->SendSignalBroadcast(BaseEntity::Signal::Attack, xorstr_(""));
 				float lastShotTime = held->lastShotTime() - GLOBAL_TIME;
 				float reloadTime = held->nextReloadTime() - GLOBAL_TIME;
-				Vector3 target = target_ply->BonePosition(AimSpotInt);
+				if (target_ply == nullptr) {
+					funcs::other::BulletPos = Vector3::Zero();
+				} else {
+					Vector3 target = target_ply->BonePosition(AimSpotInt);
 
-				if (target_ply == nullptr || !funcs::weapon::bulletteleport || !funcs::weapon::hitscan || LineOfSight(target_ply->BonePosition(head), LocalPlayer::Entity()->eyes()->position())) {
+				if (!funcs::weapon::bulletteleport || !funcs::weapon::hitscan || LineOfSight(target_ply->BonePosition(head), LocalPlayer::Entity()->eyes()->position())) {
 					funcs::other::BulletPos = Vector3::Zero();
 				}
 
@@ -1218,6 +1220,7 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 					}
 				}
 			}
+			} // end of else (target_ply != nullptr)
 		}
 		else {
 			funcs::other::BulletPos = Vector3(0, 0, 0);
