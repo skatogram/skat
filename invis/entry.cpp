@@ -236,7 +236,7 @@ DWORD _stdcall NOmain_thread(LPVOID param) {
 	initialize_cheat();
 	do_hooks();
 	d3d::init();
-	config::create_config_folder();
+	//config::create_config_folder();
 
 	return 1;
 }

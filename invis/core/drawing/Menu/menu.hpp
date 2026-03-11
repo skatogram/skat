@@ -43,7 +43,7 @@ int tab_count = 0;
 #define __ xorstr_
 
 std::vector<std::string> config_list{};
-std::vector<std::string> empty_list = { xor_str("Config folder is empty!") };
+std::vector<std::string> empty_list = { ("Config folder is empty!") };
 
 typedef void (*LPSEARCHFUNC)(LPCTSTR lpszFileName);
 
@@ -561,17 +561,17 @@ void cfgmenu()
 	{
 		ImGui::BeginChild(menu::rus ? __(u8"Конфиг") : __("Configs"), ImVec2(237, 480));
 		{
-			if (ImGui::BeginListBox("List Box Cfg", ImGui::GetWindowSize() - ImVec2(32, 260)))
+			/*if (ImGui::BeginListBox("List Box Cfg", ImGui::GetWindowSize() - ImVec2(32, 260)))
 			{
 				for (auto cfg : config::GetConfigList())
 					if (ImGui::Selectable(cfg.c_str(), cfg == selected_cfg))
 						selected_cfg = cfg;
 
 				ImGui::EndListBox();
-			}
+			}*/
 
 			ImGui::InputText(xorstr_("Config name"), config_name, 256);
-			if (ImGui::Button(xorstr_("Create"))) {
+			/*if (ImGui::Button(xorstr_("Create"))) {
 				config::create(config_name);
 				refresh_configs();
 			}
@@ -584,15 +584,15 @@ void cfgmenu()
 			if (ImGui::Button(xorstr_("Delete"))) {
 				config::erase(selected_cfg.c_str());
 				refresh_configs();
-			}
-			if (ImGui::Button(xorstr_("Open Folder"))) {
+			}*/
+		/*	if (ImGui::Button(xorstr_("Open Folder"))) {
 				static TCHAR path[MAX_PATH]{};
 				std::string folder = "";
 				if (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, path))) {
 					folder = std::string(path) + xorstr_("\\invis.v2\\");
 				}
 				ShellExecuteA(NULL, NULL, folder.c_str(), NULL, NULL, SW_SHOWNORMAL);
-			}
+			}*/
 		}
 		ImGui::EndChild();
 

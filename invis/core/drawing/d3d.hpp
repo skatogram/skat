@@ -74,51 +74,51 @@ bool menu_init = false;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 namespace d3d {
 	LRESULT WndProcHook(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	/*	static auto is_down = true;
-		static auto is_clicked = false;
-		auto g = IdaLovesMe::Gui_Ctx;
-		if (uMsg == WM_MOUSEWHEEL) {
-			if (g)
-				g->MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +0.3f : -0.3f;
-		}
-		hWnd2 = hWnd;
-		if (GetAsyncKeyState(VK_INSERT))
-		{
-			is_clicked = false;
-			is_down = true;
-		}
-		else if (!GetAsyncKeyState(VK_INSERT) && is_down)
-		{
-			is_clicked = true;
-			is_down = false;
-		}
-		else
-		{
-			is_clicked = false;
-			is_down = false;
-		}
+		/*	static auto is_down = true;
+			static auto is_clicked = false;
+			auto g = IdaLovesMe::Gui_Ctx;
+			if (uMsg == WM_MOUSEWHEEL) {
+				if (g)
+					g->MouseWheel += GET_WHEEL_DELTA_WPARAM(wParam) > 0 ? +0.3f : -0.3f;
+			}
+			hWnd2 = hWnd;
+			if (GetAsyncKeyState(VK_INSERT))
+			{
+				is_clicked = false;
+				is_down = true;
+			}
+			else if (!GetAsyncKeyState(VK_INSERT) && is_down)
+			{
+				is_clicked = true;
+				is_down = false;
+			}
+			else
+			{
+				is_clicked = false;
+				is_down = false;
+			}
 
-		if (is_clicked)
-		{
-			MenuOpen = !CMenu::get()->is_menu_opened();
-			CMenu::get()->set_menu_opened(!CMenu::get()->is_menu_opened());
+			if (is_clicked)
+			{
+				MenuOpen = !CMenu::get()->is_menu_opened();
+				CMenu::get()->set_menu_opened(!CMenu::get()->is_menu_opened());
 
-		}
+			}
 
-		auto pressed_buttons = false;
-		auto pressed_menu_key = uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP || uMsg == WM_MOUSEWHEEL;
+			auto pressed_buttons = false;
+			auto pressed_menu_key = uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONDOWN || uMsg == WM_RBUTTONUP || uMsg == WM_MOUSEWHEEL;
 
-		if (!pressed_menu_key && !CMenu::get()->SelectedItem)
-			pressed_buttons = true;
+			if (!pressed_menu_key && !CMenu::get()->SelectedItem)
+				pressed_buttons = true;
 
-		if (!pressed_buttons && CMenu::get()->is_menu_opened() && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-			return true;
+			if (!pressed_buttons && CMenu::get()->is_menu_opened() && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+				return true;
 
-		if (CMenu::get()->is_menu_opened() && (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_MOUSEMOVE))
-			return false;
+			if (CMenu::get()->is_menu_opened() && (uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONUP || uMsg == WM_MOUSEMOVE))
+				return false;
 
-		return CallWindowProc(original_windowproc, hWnd, uMsg, wParam, lParam);*/
-		//	g_KeyManager::HandleMessage(uMsg, wParam);
+			return CallWindowProc(original_windowproc, hWnd, uMsg, wParam, lParam);*/
+			//	g_KeyManager::HandleMessage(uMsg, wParam);
 
 
 		if (menu::menuopen && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
@@ -166,12 +166,12 @@ namespace d3d {
 
 	void FreeStringsInModule(HMODULE hModule) {
 		HMODULE hKernel32 = GetModuleHandle("Kernel32");
-		if ( hKernel32 != NULL ) {
+		if (hKernel32 != NULL) {
 			// Получаем адрес функции FreeLibrary
 			FARPROC pfnFreeLibrary = GetProcAddress(hKernel32, "FreeLibrary");
-			if ( pfnFreeLibrary != NULL ) {
+			if (pfnFreeLibrary != NULL) {
 				// Вызываем FreeLibrary для выгрузки DLL модуля из памяти
-				( ( void(__stdcall*)( HMODULE ) )pfnFreeLibrary )( hModule );
+				((void(__stdcall*)(HMODULE))pfnFreeLibrary)(hModule);
 			}
 		}
 	}
@@ -185,7 +185,7 @@ namespace d3d {
 			ID3D11Texture2D* renderTarget = nullptr;
 			swapChain->GetBuffer(0, __uuidof(renderTarget), reinterpret_cast<PVOID*>(&renderTarget));
 			device->CreateRenderTargetView(renderTarget, nullptr, &render_target_view);
-			renderTarget->Release( );
+			renderTarget->Release();
 			ImGui::CreateContext();
 
 			ImGui_ImplWin32_Init(game_window);
@@ -209,10 +209,10 @@ namespace d3d {
 			//if (DefaultFonts == nullptr) DefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f, NULL, io.Fonts->GetGlyphRangesCyrillic());
 			//if (SmallDefaultFonts == nullptr) SmallDefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f * 0.85, NULL, io.Fonts->GetGlyphRangesCyrillic());
 			//if (BigDefaultFonts == nullptr) BigDefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f * 1.60, NULL, io.Fonts->GetGlyphRangesCyrillic());
-			if ( DefaultFonts == nullptr ) DefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f, NULL, io.Fonts->GetGlyphRangesCyrillic( ));
-			if ( DefaultFontsEsp == nullptr ) DefaultFontsEsp = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 12.f, NULL, io.Fonts->GetGlyphRangesCyrillic( ));
-			if ( SmallDefaultFonts == nullptr ) SmallDefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f * 0.85, NULL, io.Fonts->GetGlyphRangesCyrillic( ));
-			if ( BigDefaultFonts == nullptr ) BigDefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f * 1.60, NULL, io.Fonts->GetGlyphRangesCyrillic( ));
+			if (DefaultFonts == nullptr) DefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+			if (DefaultFontsEsp == nullptr) DefaultFontsEsp = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 12.f, NULL, io.Fonts->GetGlyphRangesCyrillic());
+			if (SmallDefaultFonts == nullptr) SmallDefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f * 0.85, NULL, io.Fonts->GetGlyphRangesCyrillic());
+			if (BigDefaultFonts == nullptr) BigDefaultFonts = io.Fonts->AddFontFromMemoryTTF(TopFontff, sizeof(TopFontff), 13.f * 1.60, NULL, io.Fonts->GetGlyphRangesCyrillic());
 
 		}
 		immediate_context->OMSetRenderTargets(1, &render_target_view, nullptr);
@@ -220,26 +220,26 @@ namespace d3d {
 		screen_size = { viewport.Width, viewport.Height };
 		screen_center = { viewport.Width / 2.0f, viewport.Height / 2.0f };
 
-		
-		if ( !menu::unload ) {
-			ImGui_ImplDX11_NewFrame( );
-			ImGui_ImplWin32_NewFrame( );
-			ImGui::NewFrame( );
-			DrawList = ImGui::GetBackgroundDrawList( );
-			g_Render->BeginScene( );
-			g_Render->EndScene( );
-			if ( menu::menuopen ) MainMenu( );
 
-			
-			ImGui::Render( );
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData( ));
+		if (!menu::unload) {
+			ImGui_ImplDX11_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+			DrawList = ImGui::GetBackgroundDrawList();
+			g_Render->BeginScene();
+			g_Render->EndScene();
+			if (menu::menuopen) MainMenu();
+
+
+			ImGui::Render();
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		}
 		else {
 			static bool once = false;
 			if (!once) {
 				g_Discord->Shutdown();
 				funcs::localplayer::fov = 90;
-				if(LocalPlayer::Entity())
+				if (LocalPlayer::Entity())
 					LocalPlayer::Entity()->playerFlags() &= ~PlayerFlags::IsAdmin;
 				MH_DisableHook(MH_ALL_HOOKS);
 				TerminateThread(mainthread, -1);
@@ -259,13 +259,13 @@ namespace d3d {
 		//Renderer::reset_canvas( );
 
 		if (render_target_view)
-			render_target_view->Release( );
+			render_target_view->Release();
 
 		if (immediate_context)
-			immediate_context->Release( );
+			immediate_context->Release();
 
 		if (device)
-			device->Release( );
+			device->Release();
 
 		device = nullptr;
 		return resize_original(swapChain, bufferCount, width, height, newFormat, swapChainFlags);
@@ -288,31 +288,56 @@ namespace d3d {
 
 		unity_player = (uintptr_t)GetModuleHandleA(xorstr_("UnityPlayer.dll"));
 		game_assembly = (uintptr_t)GetModuleHandleA(xorstr_("GameAssembly.dll"));
-		//discord_hook = (uintptr_t)GetModuleHandleA(xorstr_("DiscordHook64.dll"));
 
-		auto addr = mem::find_pattern(unity_player, (PBYTE)"\x48\x8B\x05\x00\x00\x00\x00\x48\x85\xC0\x74\x08\x48\x8B\x80\x00\x00\x00\x00", xorstr_("xxx????xxxxxxxx????"));
+		while (!game_window) {
+			EnumWindows([](HWND hWnd, LPARAM lParam) -> BOOL {
+				DWORD pid = 0;
+				GetWindowThreadProcessId(hWnd, &pid);
+				if (pid == GetCurrentProcessId()) {
+					*reinterpret_cast<HWND*>(lParam) = hWnd;
+					return FALSE;
+				}
 
+				return TRUE;
+				}, reinterpret_cast<LPARAM>(&game_window));
+		}
 
-		if (!addr)
-			return false;
+		IDXGISwapChain* swapChain = nullptr;
+		ID3D11Device* device = nullptr;
+		ID3D11DeviceContext* context = nullptr;
+		auto featureLevel = D3D_FEATURE_LEVEL_11_0;
 
-		/*auto swapchain = reinterpret_cast<IDXGISwapChain * (__fastcall*)()>(unity_player + 0x10AB520)();*/
-		auto swapchain = reinterpret_cast<IDXGISwapChain * (__fastcall*)()>(addr)();
+		DXGI_SWAP_CHAIN_DESC sd = { 0 };
+		ZeroMemory(&sd, sizeof sd);
+		sd.BufferCount = 1;
+		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		sd.OutputWindow = game_window;
+		sd.SampleDesc.Count = 1;
+		sd.Windowed = TRUE;
+		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-		if (swapchain) {
-			auto table = *reinterpret_cast<PVOID**>(swapchain);
+		if (FAILED(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, 0, 0, &featureLevel, 1, D3D11_SDK_VERSION, &sd, &swapChain, &device, nullptr, &context))) {
+			MessageBoxW(0, (L"Failed to create D3D11 device and swap chain"), (L"Failure"), MB_ICONERROR);
+		}
+		else {
+			auto table = *reinterpret_cast<PVOID**>(swapChain);
+			present_original = reinterpret_cast<HRESULT(__fastcall*)(IDXGISwapChain*, UINT, UINT)>(table[8]);
+			resize_original = reinterpret_cast<HRESULT(__fastcall*)(IDXGISwapChain*, UINT, UINT, UINT, DXGI_FORMAT, UINT)>(table[13]);
+
+			context->Release();
+			device->Release();
+			swapChain->Release();
+
 			original_windowproc = (WNDPROC)SetWindowLongPtrW(game_window, GWLP_WNDPROC, (LONG_PTR)WndProcHook);
-
-			/*hookengine::hook((void*)(*(uintptr_t*)(discord_hook + 0x00E9090)), (void**)&present_original, present_hook);*/
-			hookengine::hook(( void* )table[8], ( void** ) &present_original, present_hook);
+			hookengine::hook((void*)table[8], (void**)&present_original, present_hook);
 			hookengine::hook((void*)table[13], (void**)&resize_original, resize_hook);
-			//hookengine::hook((void*)(discord_hook + 0x00179B0), (void**)&resize_original, resize_hook);
 
-			return true;
 		}
 		return false;
 	}
-
 }
 void ImGuiRendering::BeginScene()
 {

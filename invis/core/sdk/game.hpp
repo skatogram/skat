@@ -1295,7 +1295,7 @@ public:
 };
 class WaterLevel {
 public:
-	STATIC_FUNCTION("Assembly-CSharp::WaterLevel::Test(Vector3,Boolean,Boolean,BaseEntity): Boolean", Test, bool(Vector3, bool, bool, BaseEntity*));
+	STATIC_FUNCTION("Assembly-CSharp::WaterLevel::Test(Vector3,Boolean,BaseEntity): Boolean", Test, bool(Vector3, bool, BaseEntity*));
 };
 enum class EnvironmentType : int {
 	Building = 2,
@@ -3233,9 +3233,9 @@ public:
 class DDraw {
 public:
 	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Line(Vector3,Vector3,Color,Single,Boolean,Boolean): Void", Line, void(Vector3, Vector3, Color, float, bool, bool));
-	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Sphere(Vector3,Single,Color,Single,Boolean,Boolean): Void", Sphere, void(Vector3, float, Color, float, bool, bool));
-	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Arrow(Vector3,Vector3,Single,Color,Single,Boolean,Boolean): Void", Arrow, void(Vector3, Vector3, float, Color, float));
-	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Capsule(Vector3,Quaternion,Single,Single,Color,Single,Boolean,Boolean): Void", Capsule, void(Vector3, Quaternion, float, float, Color, float, bool, bool));
+	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Sphere(Vector3,Single,Color,Single,Boolean): Void", Sphere, void(Vector3, float, Color, float, bool));
+	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Arrow(Vector3,Vector3,Single,Color,Single): Void", Arrow, void(Vector3, Vector3, float, Color, float));
+	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Capsule(Vector3,Quaternion,Single,Single,Color,Single,Boolean): Void", Capsule, void(Vector3, Quaternion, float, float, Color, float, bool));
 	STATIC_FUNCTION("Assembly-CSharp::UnityEngine::DDraw::Get(): DDraw", Get, DDraw* ());
 	STATIC_FUNCTION("UnityEngine.IMGUIModule::UnityEngine::GUI::get_color(): Color", get_color, Color());
 	STATIC_FUNCTION("UnityEngine.IMGUIModule::UnityEngine::GUI::set_color(Color): Void", set_color, void(Color));
@@ -3457,9 +3457,55 @@ public:
 
 		return NULL;
 	}
-	static uintptr_t get_main_camera() {
+	static uint64_t get_main_camera() {
+		__try {
+			const auto base = (uint64_t)GetModuleHandleA(xorstr_("UnityPlayer.dll"));
 
-		return reinterpret_cast<uintptr_t(*)()>(il2cpp_resolve_icall(xorstr_("UnityEngine.Camera::get_main()")))();
+			if (!base)
+				return 0;
+
+			const auto dos_header = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
+			const auto nt_header = reinterpret_cast<IMAGE_NT_HEADERS64*>(base + dos_header->e_lfanew);
+
+			uint64_t data_base;
+			uint64_t data_size;
+
+			for (int i = 0;;) {
+				const auto section = reinterpret_cast<IMAGE_SECTION_HEADER*>(
+					base + dos_header->e_lfanew + // nt_header base 
+					sizeof(IMAGE_NT_HEADERS64) +  // start of section headers
+					(i * sizeof(IMAGE_SECTION_HEADER))); // section header at our index
+
+				if (strcmp((char*)section->Name, xorstr_(".data")) == 0) {
+					data_base = section->VirtualAddress + base;
+					data_size = section->SizeOfRawData;
+					break;
+				}
+
+				i++;
+
+				if (i >= nt_header->FileHeader.NumberOfSections) {
+					return 0;
+				}
+			}
+
+			uint64_t camera_table = 0;
+
+			const auto camera_string = memstr((char*)data_base, xorstr_("AllCameras"), data_size);
+			for (auto walker = (uint64_t*)camera_string; walker > (uint64_t*)0; walker -= 1) {
+				if (*walker > 0x100000 && *walker < 0xF00000000000000) {
+					// [[[[unityplayer.dll + ctable offset]]] + 0x30] = Camera
+					camera_table = *walker;
+					break;
+				}
+			}
+
+			if (camera_table)
+				return camera_table;
+
+			return 0;
+		}
+		__except (SafeExecution::fail(GetExceptionCode(), GetExceptionInformation())) { return 0; };
 	}
 	static Camera* get_main_camera2( ) {
 
@@ -3529,20 +3575,27 @@ public:
 		return reinterpret_cast< Rect( __fastcall* )( Camera* ) >( addr )( this );
 		
 	}
-	static bool world_to_screen( const Vector3& EntityPos, Vector2& ScreenPos )
-	{
-		auto matrix = find_matrix( );
-		if ( !matrix ) return false;
+	static bool world_to_screen(Vector3 world, Vector2& screen) {
+		const auto matrix = viewMatrix.transpose();
 
-		Vector3 TransVec = Vector3( matrix->_14, matrix->_24, matrix->_34 );
-		Vector3 RightVec = Vector3( matrix->_11, matrix->_21, matrix->_31 );
-		Vector3 UpVec = Vector3( matrix->_12, matrix->_22, matrix->_32 );
-		float w = Dot( TransVec, EntityPos ) + matrix->_44;
-		if ( w < 0.098f ) return false;
+		const Vector3 translation = { matrix[3][0], matrix[3][1], matrix[3][2] };
+		const Vector3 up = { matrix[1][0], matrix[1][1], matrix[1][2] };
+		const Vector3 right = { matrix[0][0], matrix[0][1], matrix[0][2] };
 
-		float y = Dot( UpVec, EntityPos ) + matrix->_42;
-		float x = Dot( RightVec, EntityPos ) + matrix->_41;
-		ScreenPos = Vector2( ( screen_center.x + x / w * screen_center.x ), ( screen_center.y - y / w * screen_center.y ) );
+		const auto w = translation.dot_product(world) + matrix[3][3];
+
+		if (w < 0.1f)
+			return false;
+
+		const auto x = right.dot_product(world) + matrix[0][3];
+		const auto y = up.dot_product(world) + matrix[1][3];
+
+		screen =
+		{
+			screen_center.x * (1.f + x / w),
+			screen_center.y * (1.f - y / w)
+		};
+
 		return true;
 	}
 
@@ -3593,10 +3646,14 @@ public:
 
 	//	return out;
 	//}
-	static Matrix4x4* find_matrix() {
-		auto entity = *reinterpret_cast<DWORD64*>(get_main_camera() + 0x10);
-		Matrix4x4* pViewMatrix = (Matrix4x4*)(entity + 0x30C);
-		return pViewMatrix;
+	static Matrix getViewMatrix() {
+		static auto camera_list = GetCamera();
+		if (!camera_list) return Matrix();
+
+		auto camera_table = *reinterpret_cast<uint64_t*>(camera_list);
+		auto cam = *reinterpret_cast<uint64_t*>(camera_table);
+
+		return *reinterpret_cast<Matrix*>(cam + 0x2E4);
 	}
 	//static Matrix getViewMatrix() {
 	//	static auto camera_list = GetCamera();

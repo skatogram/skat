@@ -651,19 +651,19 @@ inline void UpdateVelocity_hk(PlayerWalkMovement* self) noexcept {
 		Vector3 current1 = LocalPlayer::Entity()->transform()->position();
 		if (funcs::localplayer::walkonwater)
 		{
-			if (WaterLevel::Test(current1, true, false, LocalPlayer::Entity()))
+			if (WaterLevel::Test(current1, true, LocalPlayer::Entity()))
 			{
 				self->gravityMultiplier() = 0.0f;
 				self->flying() = true;
 				LocalPlayer::Entity()->movement()->TeleportTo(Vector3(current1.x, current1.y + 0.05, current1.z));
 				canjump = true;
 			}
-			else if (WaterLevel::Test(current1 - Vector3(0, 0.2, 0), true, false, LocalPlayer::Entity()))
+			else if (WaterLevel::Test(current1 - Vector3(0, 0.2, 0), true, LocalPlayer::Entity()))
 			{
 				self->flying() = false;
 			}
 		}
-		if ((!WaterLevel::Test(current1 - Vector3(0, 0.2, 0), true, false, LocalPlayer::Entity()) && funcs::localplayer::walkonwater) ||
+		if ((!WaterLevel::Test(current1 - Vector3(0, 0.2, 0), true, LocalPlayer::Entity()) && funcs::localplayer::walkonwater) ||
 			!funcs::localplayer::walkonwater)
 		{
 			canjump = false;
@@ -1061,7 +1061,7 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 			RaycastHit tpsphereray;
 			bool validCol = Physics::RaycastQTI(MainCamera::Camera()->Get_Position(), MainCamera::Camera()->Get_Forward(), &tpsphereray, 400.f, 256 | 2048 | 65536 | 1073741824 | 8388608 | 2097152 | 4194304 | 67108864 | 134217728 | 33554432 | 32768 | 8192 | 512 | 1, QueryTriggerInteraction::Ignore);
 			if (validCol) {
-				DDraw::Capsule(tpsphereray.point, Quaternion(), pulsation(0.1, 0.5, 0.5), 2 * pulsation(0.1, 0.5, 0.5), Color(funcs::localplayer::teleportspherecol[0], funcs::localplayer::teleportspherecol[1], funcs::localplayer::teleportspherecol[2], 1.f), 0.0001f, false, true);
+				DDraw::Capsule(tpsphereray.point, Quaternion(), pulsation(0.1, 0.5, 0.5), 2 * pulsation(0.1, 0.5, 0.5), Color(funcs::localplayer::teleportspherecol[0], funcs::localplayer::teleportspherecol[1], funcs::localplayer::teleportspherecol[2], 1.f), 0.0001f, false);
 			}
 			if (GetAsyncKeyState(funcs::localplayer::teleportspherekey))
 			{
@@ -1576,7 +1576,7 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 		}
 
 		Vector3 vector = (plly->lastSentTick()->position() + plly->transform()->position()) * 0.5f;
-		if (!plly->OnLadder() && !WaterLevel::Test(vector - Vector3(0.0f, 1.85f, 0.0f), true, false, plly)) {
+		if (!plly->OnLadder() && !WaterLevel::Test(vector - Vector3(0.0f, 1.85f, 0.0f), true, plly)) {
 			float num5 = Mathf::Max((flyhackPauseTime > 0.0f) ? 10.0f : 1.0f, 0.0f);
 			float num6 = ((plly->GetJumpHeight() + num5) * 3);
 			VMaxFlyhack = num6;
@@ -1905,7 +1905,7 @@ inline void DoMovement_hk(Projectile* projectile, float deltaTime) {
 							if ( projectile->projectileID( ) != 0 && ppu->projectileId( ) != 0 && check_hit(newBulletPosx2, projectile) )
 							{
 								projectile->DoHit(hitTest, newBulletPosx2, Vector3( ));
-								DDraw::Capsule(closestUpdateToPlayer, Quaternion( ), 0.3f, 2 * 0.3f, Color(1, 1, 1, 1), 5.f, false, true);
+								DDraw::Capsule(closestUpdateToPlayer, Quaternion( ), 0.3f, 2 * 0.3f, Color(1, 1, 1, 1), 5.f, false);
 							}
 						}
 					}
@@ -2484,11 +2484,11 @@ inline void do_hooks() {
 	hookengine::hook((void*)METHOD("Assembly-CSharp::BasePlayer::VisUpdateUsingCulling(Single,Boolean): Void"), (void**)&BasePlayer::VisUpdateUsingCulling_, VisUpdateUsingCulling);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::Projectile::Update(): Void"), (void**)&Projectile::Update_, ProjectileUpdate_hk);
 	hookengine::hook((void*)METHOD("Rust.Data::ModelState::set_flying(Boolean): Void"), (void**)&ModelState::set_flying_, set_flying_hk);
-	hookengine::hook((void*)METHOD("Assembly-CSharp::HitTest::BuildAttackMessage(BaseEntity): Attack"), (void**)&HitTest::BuildAttackMessage_, BuildAttackMessage_hk);
+	hookengine::hook((void*)METHOD("Assembly-CSharp::HitTest::BuildAttackMessage(): Attack"), (void**)&HitTest::BuildAttackMessage_, BuildAttackMessage_hk);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::BaseMelee::ProcessAttack(HitTest): Void"), (void**)&BaseMelee::ProcessAttack_, ProcessAttack_hk);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::Projectile::DoHit(HitTest,Vector3,Vector3): Boolean"), (void**)&Projectile::DoHit_, DoHit_hk);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::BaseMountable::EyePositionForPlayer(BasePlayer,Quaternion): Vector3"), (void**)&BaseMountable::EyePositionForPlayer_, EyePositionForPlayer_hk);
-	hookengine::hook((void*)METHOD("Assembly-CSharp::ItemIcon::TryToMove(Boolean): Void"), (void**)&ItemIcon::StartCoroutine_, Hk_TryToMove);
+	hookengine::hook((void*)METHOD("Assembly-CSharp::ItemIcon::TryToMove(): Void"), (void**)&ItemIcon::StartCoroutine_, Hk_TryToMove);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::BasePlayer::ClientInput(InputState): Void"), (void**)&BasePlayer::ClientInput_, ClientInput_hk);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::ItemModProjectile::GetRandomVelocity(): Single"), (void**)&ItemModProjectile::GetRandomVelocity_, GetRandomVelocity_hk);
 	hookengine::hook((void*)METHOD("Assembly-CSharp::PlayerEyes::get_BodyLeanOffset(): Vector3"), (void**)&PlayerEyes::BodyLeanOffset_, BodyLeanOffset_hk);

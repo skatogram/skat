@@ -495,6 +495,10 @@ namespace entities {
 				matcapfx = nullptr;
 				return;
 			}
+
+			viewMatrix = Camera::getViewMatrix();
+
+
 			auto entityList = BaseNetworkable::clientEntities()->entityList();
 			if (!entityList) {
 				target_ply = nullptr;
