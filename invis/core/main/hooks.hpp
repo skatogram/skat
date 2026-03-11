@@ -1130,13 +1130,13 @@ skip_aim_spot:
 				if ( target_ply != nullptr && ( GetAsyncKeyState(funcs::psilent::key) && funcs::psilent::autoshottype == 1 ) ||
 					funcs::psilent::autoshottype == 2 && GetAsyncKeyState(funcs::manipulator::manipulatorkey) ) {
 					if ( LineOfSight(target, LocalPlayer::Entity( )->eyes( )->position( )) ) {
-						if ( !math::m_strcmp(classnameheld, "BaseMelee") || !math::m_strcmp(classnameheld, "Planner") || !math::m_strcmp(classnameheld, "Hammer") ) {
-							if ( held && ( math::m_strcmp(classnameheld, "BaseProjectile") )
+						if ( !math::m_strcmp(classnameheld, "BaseMelee") && !math::m_strcmp(classnameheld, "Planner") && !math::m_strcmp(classnameheld, "Hammer") ) {
+							if ( held && ( math::m_strcmp(classnameheld, "BaseProjectile")
 								|| math::m_strcmp(classnameheld, "BowWeapon")
 								|| math::m_strcmp(classnameheld, "CompoundBowWeapon")
 								|| math::m_strcmp(classnameheld, "BaseLauncher")
 								|| math::m_strcmp(classnameheld, "CrossbowWeapon")
-								|| math::m_strcmp(classnameheld, "FlintStrikeWeapon") )
+								|| math::m_strcmp(classnameheld, "FlintStrikeWeapon") ) )
 							{
 								auto m = held->repeatDelay( ) * 0.75f;
 								float timeSinceLastTick = ( Time::realtimeSinceStartup( ) - LocalPlayer::Entity( )->lastSentTickTime( ) );
@@ -1168,7 +1168,7 @@ skip_aim_spot:
 								
 							}
 						}
-						if ( math::m_strcmp(classnameheld, "BaseMelee") && !math::m_strcmp(classnameheld, "Planner") || !math::m_strcmp(classnameheld, "Hammer") ) {
+						if ( math::m_strcmp(classnameheld, "BaseMelee") && !math::m_strcmp(classnameheld, "Planner") && !math::m_strcmp(classnameheld, "Hammer") ) {
 							if ( melee && melee != nullptr ) {
 								if ( target_ply != nullptr && target_ply->IsValid( ) && LocalPlayer::Entity( )->HasPlayerFlag(PlayerFlags::Connected) ) {
 									if ( melee->HasAttackCooldown( ) || melee->nextAttackTime( ) >= Time::time( ) || melee->timeSinceDeploy( ) < melee->deployDelay( ) ) {}
@@ -1186,12 +1186,12 @@ skip_aim_spot:
 					auto activeWeaponID = LocalPlayer::Entity()->GetActiveWeapon()->GetID();
 					if (activeWeaponID != 795236088 && activeWeaponID != 200773292 && activeWeaponID != 1525520776)
 					{
-						if ( !math::m_strcmp(classnameheld, "BaseMelee") || !math::m_strcmp(classnameheld, "Planner") || !math::m_strcmp(classnameheld, "Hammer") ) {
+						if ( math::m_strcmp(classnameheld, "BaseProjectile") || math::m_strcmp(classnameheld, "CrossbowWeapon") || math::m_strcmp(classnameheld, "FlintStrikeWeapon") ) {
 
 							BaseProjectile* ent = plly->GetHeldEntity<BaseProjectile>();
 							if (ent) {
-								BaseProjectile* held = held = LocalPlayer::Entity()->GetHeldEntity<BaseProjectile>();
-								if ( !math::m_strcmp(classnameheld, "BaseMelee") )
+								BaseProjectile* held = LocalPlayer::Entity()->GetHeldEntity<BaseProjectile>();
+								if ( held )
 								{
 									if (!did_reload)
 										time_since_last_shot = (Time::fixedTime() - fixed_time_last_shot);
