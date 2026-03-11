@@ -548,11 +548,8 @@ inline Vector3 BodyLeanOffset_hk(PlayerEyes* a1) noexcept {
 		if (DesyncMode && target_ply != nullptr) {
 
 
-				if ( !funcs::manipulator::m_manipulate.empty( ) && LocalPlayer::Entity( )->GetHeldEntity( ) ) {
-
-					return funcs::manipulator::m_manipulate;
-				}
-					
+			if ( !funcs::manipulator::m_manipulate.empty( ) && LocalPlayer::Entity( )->GetHeldEntity( ) ) {
+				return funcs::manipulator::m_manipulate;
 			}
 		}
 	}
@@ -907,7 +904,6 @@ inline void ClientInput_hk(BasePlayer* plly, uintptr_t state) {
 	}
 	if (plly->userID() == LocalPlayer::Entity()->userID()) {
 		if (target_ply == nullptr) goto skip_aim_spot;
-		auto transform = target_ply->GetTransform(head)->position();
 		if (funcs::psilent::a_spot == 0) {
 			AimSpotInt = head;
 		}
