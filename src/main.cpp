@@ -5,7 +5,7 @@
 #include <thread>
 #include "offsets.h"
 
-#define PI 3.14159265358979323846
+#define PI 3.1415926535f
 
 struct Vector3 {
     float x, y, z;
