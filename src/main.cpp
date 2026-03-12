@@ -14,23 +14,67 @@
 
 #define PI 3.1415926535f
 
+// --- ImGui Skat/Skeet Theme ---
+void SetupSkatTheme() {
+    auto& style = ImGui::GetStyle();
+    style.WindowRounding = 0.0f;
+    style.ChildRounding = 0.0f;
+    style.FrameRounding = 0.0f;
+    style.GrabRounding = 0.0f;
+    style.PopupRounding = 0.0f;
+    style.ScrollbarRounding = 0.0f;
+
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_Text] = ImVec4(0.90f, 0.90f, 0.90f, 1.00f);
+    colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
+    colors[ImGuiCol_Border] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
+    colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.12f, 0.24f, 0.45f, 1.00f); // Skat Blue
+    colors[ImGuiCol_CheckMark] = ImVec4(0.12f, 0.24f, 0.45f, 1.00f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.12f, 0.24f, 0.45f, 1.00f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.15f, 0.30f, 0.60f, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.15f, 0.15f, 0.15f, 1.00f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(0.12f, 0.24f, 0.45f, 1.00f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.15f, 0.30f, 0.60f, 1.00f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.18f, 0.35f, 0.70f, 1.00f);
+}
+
+// Simple Math for Aimbot
+struct Angle { float yaw, pitch; };
+
+Angle CalculateAngle(Vector3 local, Vector3 target) {
+    Vector3 delta = { target.x - local.x, target.y - local.y, target.z - local.z };
+    float hypers = sqrtf(delta.x * delta.x + delta.z * delta.z);
+    return {
+        atan2f(delta.z, delta.x) * (180.0f / PI),
+        atan2f(-delta.y, hypers) * (180.0f / PI)
+    };
+}
+
 // Il2Cpp Structures
 struct PlayerScript {
     char pad_00[0xBC];
-    float walkSpeed;    // 0xBC
-    char pad_C0[0x38];  // gap to 0xF8
-    float rotationY;    // 0xF8
-    float rotationX;    // 0xFC
-    float rotationZ;    // 0x100
+    float walkSpeed;
+    char pad_C0[0x38];
+    float rotationY;
+    float rotationX;
+    float rotationZ;
     char pad_104[0x8]; 
-    void* cameraComp;   // 0x108 (Camera)
-    void* fpsCam;       // 0x110 (FPSCamera)
+    void* cameraComp;
+    void* fpsCam;
     char pad_118[0x158];
-    int health;         // 0x278 (Simplified ObscuredInt)
+    int health;
     char pad_27C[0x8];
-    int armor;          // 0x284 (Simplified ObscuredInt)
+    int armor;
     char pad_288[0x8];
-    int team;           // 0x290
+    int team;
 };
 
 struct Il2CppArray {
@@ -60,40 +104,14 @@ float g_Smooth = 3.0f;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-// Simple Math for Aimbot
-struct Angle { float yaw, pitch; };
-
-Angle CalculateAngle(Vector3 local, Vector3 target) {
-    Vector3 delta = { target.x - local.x, target.y - local.y, target.z - local.z };
-    float hypers = sqrtf(delta.x * delta.x + delta.z * delta.z);
-    return {
-        atan2f(delta.z, delta.x) * (180.0f / PI),
-        atan2f(-delta.y, hypers) * (180.0f / PI)
-    };
-}
-
-PlayerScript* GetLocalPlayer() {
-    uintptr_t gameAssembly = (uintptr_t)GetModuleHandleA("GameAssembly.dll");
-    // Usually, the first player in certain lists or a static
-    // For now, we'll try to find a player with islocal = true if needed
-    // But most cheats use the get_FPSCamera to find the active camera/player context
-    return nullptr; 
-}
-
 void AimAt(PlayerScript* local, Vector3 target) {
     if (!local) return;
-
-    // Based on camPos or transform position
-    Vector3 localPos = Memory::Read<Vector3>((uintptr_t)local + 0x2C0); // _camPos
+    Vector3 localPos = Memory::Read<Vector3>((uintptr_t)local + 0x2C0);
     Angle targetAngle = CalculateAngle(localPos, target);
 
-    // Write to rotation fields
     if (g_Smooth > 1.0f) {
-        float currentX = local->rotationX;
-        float currentY = local->rotationY;
-        
-        local->rotationX += (targetAngle.pitch - currentX) / g_Smooth;
-        local->rotationY += (targetAngle.yaw - currentY) / g_Smooth;
+        local->rotationX += (targetAngle.pitch - local->rotationX) / g_Smooth;
+        local->rotationY += (targetAngle.yaw - local->rotationY) / g_Smooth;
     } else {
         local->rotationX = targetAngle.pitch;
         local->rotationY = targetAngle.yaw;
@@ -121,8 +139,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
             oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
 
             ImGui::CreateContext();
-            ImGuiIO& io = ImGui::GetIO();
-            io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+            SetupSkatTheme();
             ImGui_ImplWin32_Init(g_hWnd);
             ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
         }
@@ -136,11 +153,28 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     if (GetAsyncKeyState(VK_INSERT) & 1) g_ShowMenu = !g_ShowMenu;
 
     if (g_ShowMenu) {
-        ImGui::Begin("Kuboom Cheat", &g_ShowMenu);
-        ImGui::Checkbox("Aimbot", &g_Aimbot);
-        ImGui::SliderFloat("Smoothness", &g_Smooth, 1.0f, 10.0f);
-        ImGui::Checkbox("ESP", &g_Esp);
-        ImGui::SliderFloat("Walk Speed", &g_WalkSpeed, 1.0f, 20.0f);
+        ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Skatogram | Kuboom Internal", &g_ShowMenu, ImGuiWindowFlags_NoCollapse);
+        
+        if (ImGui::BeginTabBar("Tabs")) {
+            if (ImGui::BeginTabItem("Legit")) {
+                ImGui::Checkbox("Aimbot", &g_Aimbot);
+                ImGui::SliderFloat("Smoothness", &g_Smooth, 1.0f, 10.0f);
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Visuals")) {
+                ImGui::Checkbox("ESP", &g_Esp);
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Misc")) {
+                ImGui::SliderFloat("Walk Speed", &g_WalkSpeed, 1.0f, 20.0f);
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
+        
+        ImGui::Separator();
+        ImGui::TextDisabled("Press [End] to Unload");
         ImGui::End();
     }
 

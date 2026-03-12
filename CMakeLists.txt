@@ -39,11 +39,18 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
+    src
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE minhook d3d11)
+
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W3 /WX-)
+    # Disable common warnings for ImGui/MinHook
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     PREFIX "" 
