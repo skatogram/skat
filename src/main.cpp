@@ -2,63 +2,23 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #include <iostream>
-#include <vector>
 #include <thread>
+#include <vector>
 
+// ImGui Headers
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
+#include "imgui_internal.h"
 #include "MinHook.h"
 
+// Project Headers
 #include "offsets.h"
 #include "unity.h"
 
 #define PI 3.1415926535f
 
-// Forward declaration for ImGui Win32 handler
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-// --- Simple Math for Aimbot ---
-struct Angle { float yaw, pitch; };
-Angle CalculateAngle(Vector3 local, Vector3 target) {
-    Vector3 delta = { target.x - local.x, target.y - local.y, target.z - local.z };
-    float hypers = sqrtf(delta.x * delta.x + delta.z * delta.z);
-    return {
-        atan2f(delta.z, delta.x) * (180.0f / PI),
-        atan2f(-delta.y, hypers) * (180.0f / PI)
-    };
-}
-
-// --- Il2Cpp Structures ---
-struct PlayerScript {
-    char pad_00[0xBC];
-    float walkSpeed;
-    char pad_C0[0x38];
-    float rotationY;
-    float rotationX;
-    float rotationZ;
-    char pad_104[0x8]; 
-    void* cameraComp;
-    void* fpsCam;
-    char pad_118[0x158];
-    int health;
-    char pad_27C[0x8];
-    int armor;
-    char pad_288[0x8];
-    int team;
-};
-
-struct Il2CppArray {
-    void* klass;
-    void* monitor;
-    void* bounds;
-    int32_t max_length;
-    PlayerScript* vector[0];
-};
-
-typedef Il2CppArray* (*tGetPlayerList)();
-
-// --- Global Pointers ---
+// --- Global Variables ---
 ID3D11Device* g_Device = nullptr;
 ID3D11DeviceContext* g_Context = nullptr;
 ID3D11RenderTargetView* g_RTV = nullptr;
@@ -68,15 +28,28 @@ WNDPROC oWndProc = nullptr;
 typedef HRESULT(__stdcall* Present)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 Present oPresent = nullptr;
 
-// --- Cheat States ---
+// --- Cheat Settings (The "Fat" Part) ---
 bool g_MenuOpen = true;
-bool g_Aimbot = true;
-bool g_Esp = true;
-float g_WalkSpeed = 5.0f;
-float g_Smooth = 3.0f;
 int g_SelectedTab = 0;
 
-void ApplySkatStyle() {
+namespace Settings {
+    bool Aimbot = true;
+    float Smooth = 5.0f;
+    float FOV = 90.0f;
+    bool DrawFOV = true;
+
+    bool EspBoxes = true;
+    bool EspNames = true;
+    bool EspHealth = true;
+
+    float SpeedMult = 1.0f;
+    bool Bunnyhop = false;
+}
+
+// --- Skeet Logic ---
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+void SetupSkeetStyle() {
     auto& style = ImGui::GetStyle();
     style.WindowRounding = 0.0f;
     style.FrameRounding = 0.0f;
@@ -84,43 +57,90 @@ void ApplySkatStyle() {
     style.PopupRounding = 0.0f;
     style.ScrollbarRounding = 0.0f;
     style.WindowBorderSize = 1.0f;
+    style.ChildBorderSize = 1.0f;
     style.FrameBorderSize = 1.0f;
 
     ImVec4* colors = style.Colors;
-    colors[ImGuiCol_WindowBg] = ImVec4(0.06f, 0.06f, 0.06f, 1.00f);
-    colors[ImGuiCol_ChildBg] = ImVec4(0.08f, 0.08f, 0.08f, 1.00f);
-    colors[ImGuiCol_Border] = ImVec4(0.18f, 0.18f, 0.18f, 1.00f);
-    colors[ImGuiCol_FrameBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_TitleBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
-    colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.75f, 0.15f, 1.00f); // Skeet Green
-    colors[ImGuiCol_SliderGrab] = ImVec4(0.60f, 0.75f, 0.15f, 1.00f);
-    colors[ImGuiCol_Header] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
-}
-
-void AimAt(PlayerScript* local, Vector3 target) {
-    if (!local) return;
-    Vector3 localPos = Memory::Read<Vector3>((uintptr_t)local + 0x2C0);
-    Angle targetAngle = CalculateAngle(localPos, target);
-
-    if (g_Smooth > 1.0f) {
-        local->rotationX += (targetAngle.pitch - local->rotationX) / g_Smooth;
-        local->rotationY += (targetAngle.yaw - local->rotationY) / g_Smooth;
-    } else {
-        local->rotationX = targetAngle.pitch;
-        local->rotationY = targetAngle.yaw;
-    }
+    colors[ImGuiCol_WindowBg] = ImColor(12, 12, 12, 255);
+    colors[ImGuiCol_ChildBg] = ImColor(15, 15, 15, 255);
+    colors[ImGuiCol_PopupBg] = ImColor(15, 15, 15, 255);
+    colors[ImGuiCol_Border] = ImColor(40, 40, 40, 255);
+    colors[ImGuiCol_FrameBg] = ImColor(20, 20, 20, 255);
+    colors[ImGuiCol_FrameBgHovered] = ImColor(25, 25, 25, 255);
+    colors[ImGuiCol_FrameBgActive] = ImColor(30, 30, 30, 255);
+    colors[ImGuiCol_TitleBg] = ImColor(12, 12, 12, 255);
+    colors[ImGuiCol_TitleBgActive] = ImColor(12, 12, 12, 255);
+    colors[ImGuiCol_CheckMark] = ImColor(161, 255, 100, 255); // Skeet Green
+    colors[ImGuiCol_SliderGrab] = ImColor(161, 255, 100, 255);
+    colors[ImGuiCol_Button] = ImColor(20, 20, 20, 255);
+    colors[ImGuiCol_ButtonHovered] = ImColor(25, 25, 25, 255);
+    colors[ImGuiCol_ButtonActive] = ImColor(30, 30, 30, 255);
+    colors[ImGuiCol_Header] = ImColor(161, 255, 100, 150);
 }
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (uMsg == WM_KEYDOWN && wParam == VK_INSERT) {
-        g_MenuOpen = !g_MenuOpen;
+    if (uMsg == WM_KEYDOWN) {
+        if (wParam == VK_INSERT) {
+            g_MenuOpen = !g_MenuOpen;
+            return 0;
+        }
     }
 
     if (g_MenuOpen && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+}
+
+// --- Menu Rendering ---
+void RenderMenu() {
+    ImGui::SetNextWindowSize(ImVec2(600, 450));
+    ImGui::Begin("Gamesense", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+    
+    ImDrawList* draw = ImGui::GetWindowDrawList();
+    ImVec2 p = ImGui::GetWindowPos();
+
+    // Skeet Gradient Line
+    draw->AddRectFilledMultiColor(p, ImVec2(p.x + 600, p.y + 2), IM_COL32(50, 150, 255, 255), IM_COL32(150, 50, 255, 255), IM_COL32(150, 50, 255, 255), IM_COL32(50, 150, 255, 255));
+
+    // Left Bar Tabs
+    ImGui::BeginChild("Tabs", ImVec2(120, 0), true);
+    const char* tabNames[] = { "LEGIT", "VISUALS", "MISC", "SKINS", "CONFIGS" };
+    for (int i = 0; i < 5; i++) {
+        if (ImGui::Selectable(tabNames[i], g_SelectedTab == i, 0, ImVec2(0, 40))) {
+            g_SelectedTab = i;
+        }
+    }
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    // Content Area
+    ImGui::BeginChild("MainContent", ImVec2(0, 0), true);
+    if (g_SelectedTab == 0) { // Legit
+        ImGui::Text("Aimbot Configuration");
+        ImGui::Separator();
+        ImGui::Checkbox("Enabled", &Settings::Aimbot);
+        ImGui::SliderFloat("Smoothness", &Settings::Smooth, 1.0f, 30.0f);
+        ImGui::SliderFloat("Field of View", &Settings::FOV, 1.0f, 180.0f);
+        ImGui::Checkbox("Draw FOV Circle", &Settings::DrawFOV);
+    } 
+    else if (g_SelectedTab == 1) { // Visuals
+        ImGui::Text("ESP Options");
+        ImGui::Separator();
+        ImGui::Checkbox("Box ESP", &Settings::EspBoxes);
+        ImGui::Checkbox("Name ESP", &Settings::EspNames);
+        ImGui::Checkbox("Health Bar", &Settings::EspHealth);
+    }
+    else if (g_SelectedTab == 2) { // Misc
+        ImGui::Text("Movement & Exploits");
+        ImGui::Separator();
+        ImGui::SliderFloat("Speed Hack", &Settings::SpeedMult, 1.0f, 10.0f);
+        ImGui::Checkbox("Bhop", &Settings::Bunnyhop);
+    }
+    ImGui::EndChild();
+
+    ImGui::End();
 }
 
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
@@ -139,7 +159,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
             oWndProc = (WNDPROC)SetWindowLongPtr(g_Window, GWLP_WNDPROC, (LONG_PTR)WndProc);
 
             ImGui::CreateContext();
-            ApplySkatStyle();
+            SetupSkeetStyle();
             ImGui_ImplWin32_Init(g_Window);
             ImGui_ImplDX11_Init(g_Device, g_Context);
         }
@@ -149,36 +169,11 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    if (g_Esp) {
-        ImGui::GetBackgroundDrawList()->AddText(ImVec2(10.0f, 10.0f), IM_COL32(255, 255, 255, 255), "Skatogram Internal | Kuboom");
-    }
+    // Watermark
+    ImGui::GetBackgroundDrawList()->AddText(ImVec2(10, 10), IM_COL32(255, 255, 255, 200), "skatogram-internal | stable | msvc");
 
     if (g_MenuOpen) {
-        ImGui::SetNextWindowSize(ImVec2(550, 420));
-        ImGui::Begin("Skatogram Internal", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
-        
-        ImGui::GetWindowDrawList()->AddRectFilledMultiColor(ImGui::GetWindowPos(), ImVec2(ImGui::GetWindowPos().x + 550, ImGui::GetWindowPos().y + 2), IM_COL32(50, 150, 255, 255), IM_COL32(150, 50, 255, 255), IM_COL32(150, 50, 255, 255), IM_COL32(50, 150, 255, 255));
-
-        ImGui::Columns(2, nullptr, false);
-        ImGui::SetColumnWidth(0, 140);
-        
-        const char* tabs[] = { "Aimbot", "Visuals", "Misc", "Settings" };
-        for (int i = 0; i < 4; i++) {
-            if (ImGui::Selectable(tabs[i], g_SelectedTab == i, 0, ImVec2(0, 35))) g_SelectedTab = i;
-        }
-        
-        ImGui::NextColumn();
-        ImGui::BeginChild("Content", ImVec2(0, 0), true);
-        if (g_SelectedTab == 0) {
-            ImGui::Checkbox("Master Aimbot", &g_Aimbot);
-            ImGui::SliderFloat("Smoothness Factor", &g_Smooth, 1.0f, 30.0f);
-        } else if (g_SelectedTab == 1) {
-            ImGui::Checkbox("Enable ESP", &g_Esp);
-        } else if (g_SelectedTab == 2) {
-            ImGui::SliderFloat("Walk Speed Multiplier", &g_WalkSpeed, 1.0f, 100.0f);
-        }
-        ImGui::EndChild();
-        ImGui::End();
+        RenderMenu();
     }
 
     ImGui::Render();
@@ -188,10 +183,12 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
+// --- Main Init ---
 void MainThread(HMODULE hModule) {
-    uintptr_t gameAssembly = 0;
-    while (!(gameAssembly = (uintptr_t)GetModuleHandleA("GameAssembly.dll"))) Sleep(100);
+    // Wait for the game to initialize
+    while (!GetModuleHandleA("GameAssembly.dll")) Sleep(100);
 
+    // SwapChain Hooking
     DXGI_SWAP_CHAIN_DESC sd = {};
     sd.BufferCount = 1;
     sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -217,50 +214,7 @@ void MainThread(HMODULE hModule) {
         MH_EnableHook(oPresent);
     }
 
-    typedef bool (*tIsLocal)(void*);
-    auto isLocalFn = (tIsLocal)(gameAssembly + 0x63AAE0);
-
-    while (!(GetAsyncKeyState(VK_END) & 1)) {
-        auto getOtherPlayers = (tGetPlayerList)(gameAssembly + Offsets::otherPlayers);
-        Il2CppArray* list = getOtherPlayers();
-        
-        if (list && list->max_length > 0) {
-            PlayerScript* localPlayer = nullptr;
-            for (int i = 0; i < list->max_length; i++) {
-                if (isLocalFn(list->vector[i])) {
-                    localPlayer = list->vector[i];
-                    break;
-                }
-            }
-
-            if (localPlayer) {
-                if (g_WalkSpeed > 5.0f) localPlayer->walkSpeed = g_WalkSpeed;
-
-                if (g_Aimbot && GetAsyncKeyState(VK_RBUTTON)) {
-                    float closestDist = 9999.0f;
-                    Vector3 bestTarget = {0,0,0};
-                    bool found = false;
-
-                    for (int i = 0; i < list->max_length; i++) {
-                        PlayerScript* enemy = list->vector[i];
-                        if (!enemy || enemy == localPlayer || enemy->team == localPlayer->team || enemy->health <= 0) continue;
-
-                        Vector3 localPos = Memory::Read<Vector3>((uintptr_t)localPlayer + 0x2C0);
-                        Vector3 enemyPos = Memory::Read<Vector3>((uintptr_t)enemy + 0x2C0);
-
-                        float dist = localPos.Distance(enemyPos);
-                        if (dist < closestDist) {
-                            closestDist = dist;
-                            bestTarget = enemyPos;
-                            found = true;
-                        }
-                    }
-                    if (found) AimAt(localPlayer, bestTarget);
-                }
-            }
-        }
-        Sleep(5);
-    }
+    while (!(GetAsyncKeyState(VK_END) & 1)) Sleep(100);
 
     MH_DisableHook(oPresent);
     MH_Uninitialize();
