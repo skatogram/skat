@@ -58,6 +58,20 @@ bool g_Esp = true;
 float g_WalkSpeed = 5.0f;
 float g_Smooth = 3.0f;
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Simple Math for Aimbot
+struct Angle { float yaw, pitch; };
+
+Angle CalculateAngle(Vector3 local, Vector3 target) {
+    Vector3 delta = { target.x - local.x, target.y - local.y, target.z - local.z };
+    float hypers = sqrtf(delta.x * delta.x + delta.z * delta.z);
+    return {
+        atan2f(delta.z, delta.x) * (180.0f / PI),
+        atan2f(-delta.y, hypers) * (180.0f / PI)
+    };
+}
+
 PlayerScript* GetLocalPlayer() {
     uintptr_t gameAssembly = (uintptr_t)GetModuleHandleA("GameAssembly.dll");
     // Usually, the first player in certain lists or a static
@@ -159,7 +173,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
                 // For now, we print health/team info in the corner as a HUD
                 char buf[64];
                 sprintf_s(buf, "Player %d | Team: %d | HP: %d", i, player->team, player->health);
-                ImGui::GetBackgroundDrawList()->AddText(ImVec2(10, 60 + i * 20), color, buf);
+                ImGui::GetBackgroundDrawList()->AddText(ImVec2(10.0f, 60.0f + (float)i * 20.0f), color, buf);
             }
         }
     }
