@@ -1,16 +1,51 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 project(KuboomCheat)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(${PROJECT_NAME} SHARED src/main.cpp src/offsets.h)
+include(FetchContent)
+
+# MinHook
+FetchContent_Declare(
+  minhook
+  GIT_REPOSITORY https://github.com/TsudaKageyu/minhook.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(minhook)
+
+# ImGui
+FetchContent_Declare(
+  imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(imgui)
+
+set(IMGUI_SOURCES 
+    ${imgui_SOURCE_DIR}/imgui.cpp 
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp 
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp 
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
+)
+
+add_library(${PROJECT_NAME} SHARED 
+    src/main.cpp 
+    src/offsets.h
+    ${IMGUI_SOURCES}
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE 
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE minhook d3d11)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES 
     PREFIX "" 
     SUFFIX ".dll"
 )
-
-# If you use MinHook, you can add it here
-# find_package(MinHook REQUIRED)
-# target_link_libraries(${PROJECT_NAME} MinHook::MinHook)
