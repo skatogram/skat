@@ -15,9 +15,22 @@
 #define PI 3.1415926535f
 
 // Il2Cpp Structures
-struct PhotonPlayer {
-    char pad[0xBC];
-    float walkSpeed;
+struct PlayerScript {
+    char pad_00[0xBC];
+    float walkSpeed;    // 0xBC
+    char pad_C0[0x38];  // gap to 0xF8
+    float rotationY;    // 0xF8
+    float rotationX;    // 0xFC
+    float rotationZ;    // 0x100
+    char pad_104[0x8]; 
+    void* cameraComp;   // 0x108 (Camera)
+    void* fpsCam;       // 0x110 (FPSCamera)
+    char pad_118[0x158];
+    int health;         // 0x278 (Simplified ObscuredInt)
+    char pad_27C[0x8];
+    int armor;          // 0x284 (Simplified ObscuredInt)
+    char pad_288[0x8];
+    int team;           // 0x290
 };
 
 struct Il2CppArray {
@@ -25,7 +38,7 @@ struct Il2CppArray {
     void* monitor;
     void* bounds;
     int32_t max_length;
-    PhotonPlayer* vector[0];
+    PlayerScript* vector[0];
 };
 
 typedef Il2CppArray* (*tGetPlayerList)();
@@ -40,11 +53,38 @@ typedef HRESULT(__stdcall* Present)(IDXGISwapChain* pSwapChain, UINT SyncInterva
 Present oPresent = nullptr;
 
 bool g_ShowMenu = true;
-bool g_Aimbot = false;
-bool g_Esp = false;
+bool g_Aimbot = true;
+bool g_Esp = true;
 float g_WalkSpeed = 5.0f;
+float g_Smooth = 3.0f;
 
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+PlayerScript* GetLocalPlayer() {
+    uintptr_t gameAssembly = (uintptr_t)GetModuleHandleA("GameAssembly.dll");
+    // Usually, the first player in certain lists or a static
+    // For now, we'll try to find a player with islocal = true if needed
+    // But most cheats use the get_FPSCamera to find the active camera/player context
+    return nullptr; 
+}
+
+void AimAt(PlayerScript* local, Vector3 target) {
+    if (!local) return;
+
+    // Based on camPos or transform position
+    Vector3 localPos = Memory::Read<Vector3>((uintptr_t)local + 0x2C0); // _camPos
+    Angle targetAngle = CalculateAngle(localPos, target);
+
+    // Write to rotation fields
+    if (g_Smooth > 1.0f) {
+        float currentX = local->rotationX;
+        float currentY = local->rotationY;
+        
+        local->rotationX += (targetAngle.pitch - currentX) / g_Smooth;
+        local->rotationY += (targetAngle.yaw - currentY) / g_Smooth;
+    } else {
+        local->rotationX = targetAngle.pitch;
+        local->rotationY = targetAngle.yaw;
+    }
+}
 
 WNDPROC oWndProc;
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -84,36 +124,42 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
     if (g_ShowMenu) {
         ImGui::Begin("Kuboom Cheat", &g_ShowMenu);
         ImGui::Checkbox("Aimbot", &g_Aimbot);
+        ImGui::SliderFloat("Smoothness", &g_Smooth, 1.0f, 10.0f);
         ImGui::Checkbox("ESP", &g_Esp);
         ImGui::SliderFloat("Walk Speed", &g_WalkSpeed, 1.0f, 20.0f);
         ImGui::End();
     }
 
     if (g_Esp) {
-        ImGui::GetBackgroundDrawList()->AddText(ImVec2(10, 10), IM_COL32(255, 255, 0, 255), "ESP: ACTIVE (RIGHT CLICK TO AIM)");
+        ImGui::GetBackgroundDrawList()->AddText(ImVec2(10, 30), IM_COL32(255, 255, 0, 255), "ESP: ACTIVE (HOLD RBUTTON TO AIM)");
         
         uintptr_t gameAssembly = (uintptr_t)GetModuleHandleA("GameAssembly.dll");
         auto getOtherPlayers = (tGetPlayerList)(gameAssembly + Offsets::otherPlayers);
-        
+        typedef bool (*tIsLocal)(void*);
+        auto isLocalFn = (tIsLocal)(gameAssembly + 0x63AAE0);
+
         Il2CppArray* list = getOtherPlayers();
         if (list && list->max_length > 0) {
+            PlayerScript* localPlayer = nullptr;
             for (int i = 0; i < list->max_length; i++) {
-                PhotonPlayer* player = list->vector[i];
-                if (!player) continue;
-
-                // 1. Get Position (Usually via Transform)
-                // Vector3 pos = GetPlayerPos(player); 
-                
-                // 2. World To Screen
-                // Vector2 screen;
-                // if (WorldToScreen(pos, screen, viewMatrix, width, height)) {
-                //      ImGui::GetBackgroundDrawList()->AddRect(ImVec2(screen.x - 10, screen.y - 10), ImVec2(screen.x + 10, screen.y + 10), IM_COL32(255, 0, 0, 255));
-                // }
-                
-                // Example modification (Speed)
-                if (g_WalkSpeed > 5.0f) {
-                    player->walkSpeed = g_WalkSpeed;
+                if (isLocalFn(list->vector[i])) {
+                    localPlayer = list->vector[i];
+                    break;
                 }
+            }
+
+            for (int i = 0; i < list->max_length; i++) {
+                PlayerScript* player = list->vector[i];
+                if (!player || player == localPlayer) continue;
+
+                // Simple Visual Indicator (Until WorldToScreen is fully mapped)
+                ImU32 color = (localPlayer && player->team == localPlayer->team) ? 
+                              IM_COL32(0, 255, 0, 255) : IM_COL32(255, 0, 0, 255);
+                
+                // For now, we print health/team info in the corner as a HUD
+                char buf[64];
+                sprintf_s(buf, "Player %d | Team: %d | HP: %d", i, player->team, player->health);
+                ImGui::GetBackgroundDrawList()->AddText(ImVec2(10, 60 + i * 20), color, buf);
             }
         }
     }
@@ -159,9 +205,60 @@ void CheatThread(HMODULE hModule) {
         MH_EnableHook(oPresent);
     }
 
+    typedef bool (*tIsLocal)(void*);
+    auto isLocalFn = (tIsLocal)(gameAssembly + 0x63AAE0); // islocal getter RVA
+
     while (!(GetAsyncKeyState(VK_END) & 1)) {
-        // Core hack logic (Aimbot/Speed)
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        auto getOtherPlayers = (tGetPlayerList)(gameAssembly + Offsets::otherPlayers);
+        Il2CppArray* list = getOtherPlayers();
+        
+        if (list && list->max_length > 0) {
+            PlayerScript* localPlayer = nullptr;
+
+            // 1. Find local player first to know team/pos
+            for (int i = 0; i < list->max_length; i++) {
+                if (isLocalFn(list->vector[i])) {
+                    localPlayer = list->vector[i];
+                    break;
+                }
+            }
+
+            if (localPlayer) {
+                // Application of Speedhack
+                if (g_WalkSpeed > 5.0f) localPlayer->walkSpeed = g_WalkSpeed;
+
+                // 2. Aimbot Logic
+                if (g_Aimbot && GetAsyncKeyState(VK_RBUTTON)) {
+                    float closestDist = 9999.0f;
+                    Vector3 bestTarget = {0,0,0};
+                    bool found = false;
+
+                    for (int i = 0; i < list->max_length; i++) {
+                        PlayerScript* enemy = list->vector[i];
+                        if (!enemy || enemy == localPlayer) continue;
+
+                        // Team check
+                        if (enemy->team == localPlayer->team) continue;
+
+                        // Health check (if health is 0, skip)
+                        if (enemy->health <= 0) continue;
+
+                        Vector3 localPos = Memory::Read<Vector3>((uintptr_t)localPlayer + 0x2C0);
+                        Vector3 enemyPos = Memory::Read<Vector3>((uintptr_t)enemy + 0x2C0); // Using _camPos/Pos
+
+                        float dist = localPos.Distance(enemyPos);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            bestTarget = enemyPos;
+                            found = true;
+                        }
+                    }
+
+                    if (found) AimAt(localPlayer, bestTarget);
+                }
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
     MH_DisableHook(oPresent);
